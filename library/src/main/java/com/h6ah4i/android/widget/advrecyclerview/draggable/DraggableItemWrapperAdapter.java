@@ -451,6 +451,9 @@ class DraggableItemWrapperAdapter<VH extends RecyclerView.ViewHolder> extends Si
         swipeableItemAdapter.onSetSwipeBackground(holder, correctedPosition, type);
     }
 
+    @Override
+    public void onSwipeItemStarted(VH holder, int position) {}
+
     @SuppressWarnings("unchecked")
     @Override
     public SwipeResultAction onSwipeItem(VH holder, int position, int result) {

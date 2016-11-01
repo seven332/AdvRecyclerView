@@ -641,6 +641,9 @@ class ExpandableRecyclerViewWrapperAdapter
         }
     }
 
+    @Override
+    public void onSwipeItemStarted(RecyclerView.ViewHolder holder, int position) {}
+
     @SuppressWarnings("unchecked")
     @Override
     public SwipeResultAction onSwipeItem(RecyclerView.ViewHolder holder, int position, int result) {

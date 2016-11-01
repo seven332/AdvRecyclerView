@@ -65,6 +65,14 @@ public interface SwipeableItemAdapter<T extends RecyclerView.ViewHolder> {
     void onSetSwipeBackground(T holder, int position, @SwipeableItemDrawableTypes int type);
 
     /**
+     * Called when starting to swipe item
+     *
+     * @param holder The ViewHolder which is associated to the swiping item.
+     * @param position The position of the item within the adapter's data set.
+     */
+    void onSwipeItemStarted(T holder, int position);
+
+    /**
      * Called when item is swiped.
      *
      * *Note that do not change the data set and do not call notifyDataXXX() methods inside of this method.*
