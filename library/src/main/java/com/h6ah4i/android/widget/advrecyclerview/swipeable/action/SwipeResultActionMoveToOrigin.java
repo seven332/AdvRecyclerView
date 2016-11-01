@@ -1,5 +1,5 @@
 /*
- *    Copyright (C) 2015 Haruki Hasegawa
+ *    Copyright (C) 2016 Haruki Hasegawa
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,19 +14,12 @@
  *    limitations under the License.
  */
 
-package com.h6ah4i.android.widget.advrecyclerview.utils;
+package com.h6ah4i.android.widget.advrecyclerview.swipeable.action;
 
-import android.support.v7.widget.RecyclerView;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 
-import com.h6ah4i.android.widget.advrecyclerview.adapter.SimpleWrapperAdapter;
-
-/**
- * This class exists just for compatibility purpose and it will be deprecated soon. Use {@link SimpleWrapperAdapter} directly.
- * @param <VH> ViewHolder type
- */
-// @Deprecated
-public class BaseWrapperAdapter<VH extends RecyclerView.ViewHolder> extends SimpleWrapperAdapter<VH> {
-    public BaseWrapperAdapter(RecyclerView.Adapter<VH> adapter) {
-        super(adapter);
+public class SwipeResultActionMoveToOrigin extends SwipeResultAction {
+    public SwipeResultActionMoveToOrigin() {
+        super(RecyclerViewSwipeManager.AFTER_SWIPE_REACTION_MOVE_TO_ORIGIN);
     }
 }

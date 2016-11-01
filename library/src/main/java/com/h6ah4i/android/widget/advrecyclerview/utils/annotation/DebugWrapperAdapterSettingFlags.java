@@ -1,5 +1,5 @@
 /*
- *    Copyright (C) 2015 Haruki Hasegawa
+ *    Copyright (C) 2016 Haruki Hasegawa
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +14,19 @@
  *    limitations under the License.
  */
 
-package com.h6ah4i.android.widget.advrecyclerview.swipeable.annotation;
+package com.h6ah4i.android.widget.advrecyclerview.utils.annotation;
 
 import android.support.annotation.IntDef;
 
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
+import com.h6ah4i.android.widget.advrecyclerview.utils.DebugWrapperAdapter;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @IntDef(flag = true, value = {
-        /*SwipeableItemConstants.AFTER_SWIPE_REACTION_DEFAULT,*/
-        SwipeableItemConstants.AFTER_SWIPE_REACTION_MOVE_TO_ORIGIN,
-        SwipeableItemConstants.AFTER_SWIPE_REACTION_MOVE_TO_SWIPED_DIRECTION,
-        SwipeableItemConstants.AFTER_SWIPE_REACTION_REMOVE_ITEM,
-        SwipeableItemConstants.AFTER_SWIPE_REACTION_DO_NOTHING,
+        DebugWrapperAdapter.FLAG_VERIFY_WRAP_POSITION,
+        DebugWrapperAdapter.FLAG_VERIFY_UNWRAP_POSITION,
 })
 @Retention(RetentionPolicy.SOURCE)
-public @interface SwipeableItemAfterReactions {
+public @interface DebugWrapperAdapterSettingFlags {
 }

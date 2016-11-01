@@ -19,6 +19,7 @@ package com.h6ah4i.android.widget.advrecyclerview.expandable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.h6ah4i.android.widget.advrecyclerview.adapter.SimpleWrapperAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemViewHolder;
@@ -26,13 +27,14 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
-import com.h6ah4i.android.widget.advrecyclerview.utils.BaseWrapperAdapter;
+import com.h6ah4i.android.widget.advrecyclerview.adapter.ItemIdComposer;
+import com.h6ah4i.android.widget.advrecyclerview.adapter.ItemViewTypeComposer;
 import com.h6ah4i.android.widget.advrecyclerview.utils.WrapperAdapterUtils;
 
 import java.util.List;
 
 class ExpandableRecyclerViewWrapperAdapter
-        extends BaseWrapperAdapter<RecyclerView.ViewHolder>
+        extends SimpleWrapperAdapter<RecyclerView.ViewHolder>
         implements DraggableItemAdapter<RecyclerView.ViewHolder>,
         SwipeableItemAdapter<RecyclerView.ViewHolder> {
 
@@ -42,7 +44,7 @@ class ExpandableRecyclerViewWrapperAdapter
     private interface Constants extends ExpandableItemConstants {
     }
 
-    private static final int VIEW_TYPE_FLAG_IS_GROUP = ExpandableAdapterHelper.VIEW_TYPE_FLAG_IS_GROUP;
+    private static final int VIEW_TYPE_FLAG_IS_GROUP = ItemViewTypeComposer.BIT_MASK_EXPANDABLE_FLAG;
 
     private static final int STATE_FLAG_INITIAL_VALUE = -1;
 
@@ -57,7 +59,7 @@ class ExpandableRecyclerViewWrapperAdapter
     private RecyclerViewExpandableItemManager.OnGroupExpandListener mOnGroupExpandListener;
     private RecyclerViewExpandableItemManager.OnGroupCollapseListener mOnGroupCollapseListener;
 
-    public ExpandableRecyclerViewWrapperAdapter(RecyclerViewExpandableItemManager manager, RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, int[] expandedItemsSavedState) {
+    public ExpandableRecyclerViewWrapperAdapter(RecyclerViewExpandableItemManager manager, RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, long[] expandedItemsSavedState) {
         super(adapter);
 
         mExpandableItemAdapter = getExpandableItemAdapter(adapter);
@@ -72,7 +74,7 @@ class ExpandableRecyclerViewWrapperAdapter
         mExpandableListManager = manager;
 
         mPositionTranslator = new ExpandablePositionTranslator();
-        mPositionTranslator.build(mExpandableItemAdapter, false);
+        mPositionTranslator.build(mExpandableItemAdapter, mExpandableListManager.getDefaultGroupsExpandedState());
 
         if (expandedItemsSavedState != null) {
             // NOTE: do not call hook routines and listener methods
@@ -107,11 +109,11 @@ class ExpandableRecyclerViewWrapperAdapter
 
         if (childPosition == RecyclerView.NO_POSITION) {
             final long groupId = mExpandableItemAdapter.getGroupId(groupPosition);
-            return ExpandableAdapterHelper.getCombinedGroupId(groupId);
+            return ItemIdComposer.composeExpandableGroupId(groupId);
         } else {
             final long groupId = mExpandableItemAdapter.getGroupId(groupPosition);
             final long childId = mExpandableItemAdapter.getChildId(groupPosition, childPosition);
-            return ExpandableAdapterHelper.getCombinedChildId(groupId, childId);
+            return ItemIdComposer.composeExpandableChildId(groupId, childId);
         }
     }
 
@@ -202,8 +204,8 @@ class ExpandableRecyclerViewWrapperAdapter
 
     private void rebuildPositionTranslator() {
         if (mPositionTranslator != null) {
-            int[] savedState = mPositionTranslator.getSavedStateArray();
-            mPositionTranslator.build(mExpandableItemAdapter, false);
+            long[] savedState = mPositionTranslator.getSavedStateArray();
+            mPositionTranslator.build(mExpandableItemAdapter, mExpandableListManager.getDefaultGroupsExpandedState());
 
             // NOTE: do not call hook routines and listener methods
             mPositionTranslator.restoreExpandedGroupItems(savedState, null, null, null);
@@ -639,9 +641,6 @@ class ExpandableRecyclerViewWrapperAdapter
         }
     }
 
-    @Override
-    public void onSwipeItemStarted(RecyclerView.ViewHolder holder, int position) {}
-
     @SuppressWarnings("unchecked")
     @Override
     public SwipeResultAction onSwipeItem(RecyclerView.ViewHolder holder, int position, int result) {
@@ -792,7 +791,7 @@ class ExpandableRecyclerViewWrapperAdapter
         return mPositionTranslator.getFlatPosition(packedPosition);
     }
 
-    /*package*/ int[] getExpandedItemsSavedStateArray() {
+    /*package*/ long[] getExpandedItemsSavedStateArray() {
         if (mPositionTranslator != null) {
             return mPositionTranslator.getSavedStateArray();
         } else {
@@ -808,7 +807,7 @@ class ExpandableRecyclerViewWrapperAdapter
         mOnGroupCollapseListener = listener;
     }
 
-    /*package*/ void restoreState(int[] adapterSavedState, boolean callHook, boolean callListeners) {
+    /*package*/ void restoreState(long[] adapterSavedState, boolean callHook, boolean callListeners) {
         mPositionTranslator.restoreExpandedGroupItems(
                 adapterSavedState,
                 (callHook ? mExpandableItemAdapter : null),
@@ -816,12 +815,12 @@ class ExpandableRecyclerViewWrapperAdapter
                 (callListeners ? mOnGroupCollapseListener : null));
     }
 
-    /*package*/ void notifyGroupItemChanged(int groupPosition) {
+    /*package*/ void notifyGroupItemChanged(int groupPosition, Object payload) {
         final long packedPosition = ExpandableAdapterHelper.getPackedPositionForGroup(groupPosition);
         final int flatPosition = mPositionTranslator.getFlatPosition(packedPosition);
 
         if (flatPosition != RecyclerView.NO_POSITION) {
-            notifyItemChanged(flatPosition);
+            notifyItemChanged(flatPosition, payload);
         }
     }
 
